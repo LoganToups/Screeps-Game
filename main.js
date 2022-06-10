@@ -4,7 +4,7 @@ var roleBuilder = require('role.builder');
 var roleFixer = require('role.fixer');
 
 //Add an extra work to the creeps bodys <----
-//test 1
+//test
 
 module.exports.loop = function () 
 {
