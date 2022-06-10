@@ -1,46 +1,39 @@
-var roleUpgrader =
-{
-
-    run: function (creep)
-    {
+module.exports = {
+    // a function to run the logic for this role
+    run: function (creep) {
+        //Creeps Ident Tag
         creep.say('🌐')
-        
-        //if the creep state is set to upgradding and the energy it is carry falls to 0, stop upgrading and do soemthing else
-        if (creep.memory.upgrading && creep.carry.energy == 0) 
-        {
-            creep.memory.upgrading = false;
+        // if creep is bringing energy to the controller but has no energy left
+        if (creep.memory.working == true && creep.carry.energy == 0) {
+            // switch state
+            creep.memory.working = false;
+        }
+        // if creep is harvesting energy but is full
+        else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
+            // switch state
+            creep.memory.working = true;
         }
 
-        //if the creep is NOT upgrading, and the energy capacity is at max, start upgrading.
-        if (!creep.memory.upgrading && creep.carry.energy == creep.carryCapacity) 
-        {
-            creep.memory.upgrading = true;
-        }
+        // if creep is supposed to transfer energy to the controller
+        if (creep.memory.working == true) {
+            // instead of upgraderController we could also use:
+            // if (creep.transfer(creep.room.controller, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
 
-        //if the creep is NOT upgrading, then start mining until the energy capacity is at max
-        if (!creep.memory.upgrading) {
-            var sources = creep.room.find(FIND_SOURCES);
-            if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ccccff' } });
-
-            }
-        }
-        // this will allow the creep to find and upgrade the controller if it's memory is set to upgrading
-        else {
+            // try to upgrade the controller
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#0000ff' } });
+                // if not in range, move towards the controller
+                creep.moveTo(creep.room.controller);
             }
         }
-        //signing a controller to display a message
-        
-        /*if(creep.room.controller)
-        {
-            if(creep.signController(creep.room.controller, "Bby dont hurt me, it's my first time <3") == ERR_NOT_IN_RANGE) 
-            {
-            creep.moveTo(creep.room.controller);
+        // if creep is supposed to harvest energy from source
+        else {
+            // find closest source
+            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+            // try to harvest energy, if the source is not in range
+            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                // move towards the source
+                creep.moveTo(source);
             }
-        }*/
+        }
     }
 };
-
-module.exports = roleUpgrader;

@@ -1,83 +1,90 @@
+// import modules
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
-var roleFixer = require('role.fixer');
+var roleRepairer = require('role.repairer');
 
-//Add an extra work to the creeps bodys <----
-
-module.exports.loop = function () 
-{
-    //clear dead creeps from memory
-    for(var name in Memory.creeps)
-    {
-        if(!Game.creeps[name]){
+module.exports.loop = function () {
+    // check for memory entries of died creeps by iterating over Memory.creeps
+    for (let name in Memory.creeps) {
+        // and checking if the creep is still alive
+        if (Game.creeps[name] == undefined) {
+            // if not, delete the memory entry
             delete Memory.creeps[name];
-            console.log('clearing non-existing creeps memory:', name);
         }
     }
-    /*Consolidated*/
-    // find how many creeps there are in the room by role
-    var numberOfHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    var numberOfupgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    var numberOfBuilders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    var numberOfFixers = _.filter(Game.creeps, (creep) => creep.memory.role == 'fixer');
 
-    /*added prioritization*/
-    //Look how many creeps are left by role, and create more when there aren't enough
-    if (numberOfHarvesters.length < 1)
-    {
-        var newName = 'Harvester' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
-            { memory: { role: 'harvester' } })
-        /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works*/
-        if (Game.spawns['Spawn1'] == ERR_NOT_ENOUGH_ENERGY && numberOfHarvesters.length == 0)
-        {
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } })
-        }
-    }
- 
-   if (numberOfupgraders.length < 3)
-    {
-        var newName = 'Upgrader' + Game.time;;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
-        {memory: {role: 'upgrader'}});
-    }
-    
-   if (numberOfBuilders.length < 1)
-    {
-        var newName = 'builder' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
-        {memory: {role: 'builder'}});
-    }
-
-    if (numberOfFixers.length < 2)
-    {
-        var newName = 'Fixer' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE], newName,
-        {memory: {role: 'fixer'}});
-    }
-    
-    for(var name in Game.creeps)
-    {
+    // for every creep name in Game.creeps
+    for (let name in Game.creeps) {
+        // get the creep object
         var creep = Game.creeps[name];
-        if(creep.memory.role == 'harvester')
-        {
+
+        // if creep is harvester, call harvester script
+        if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
-        if(creep.memory.role == 'upgrader')
-        {
+        // if creep is upgrader, call upgrader script
+        else if (creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
         }
-        if(creep.memory.role == 'builder')
-        {
+        // if creep is builder, call builder script
+        else if (creep.memory.role == 'builder') {
             roleBuilder.run(creep);
         }
-        if(creep.memory.role == 'fixer')
-        {
-            roleFixer.run(creep);
+        else if (creep.memory.role == 'repairer') {
+            roleRepairer.run(creep);
         }
     }
-}
 
+    // setup some minimum numbers for different roles
+    var minimumNumberOfHarvesters = 10;
+    var minimumNumberOfUpgraders = 1;
+    var minimumNumberOfBuilders = 1;
+    var minimumNumberOfRepairers = 2;
 
-//WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE
+    // count the number of creeps alive for each role
+    // _.sum will count the number of properties in Game.creeps filtered by the
+    //  arrow function, which checks for the creep being a harvester
+    var numberOfHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'harvester');
+    var numberOfUpgraders = _.sum(Game.creeps, (c) => c.memory.role == 'upgrader');
+    var numberOfBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'builder');
+    var numberOfRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'repairer');
+
+    var name = undefined;
+
+    // if not enough harvesters
+    if (numberOfHarvesters < minimumNumberOfHarvesters) {
+        // try to spawn one
+        name = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, MOVE], undefined,
+            { role: 'harvester', working: false });
+    }
+    // if not enough upgraders
+    else if (numberOfUpgraders < minimumNumberOfUpgraders) {
+        // try to spawn one
+        name = Game.spawns.Spawn1.createCreep([WORK, CARRY, MOVE, MOVE], undefined,
+            { role: 'upgrader', working: false });
+    }
+    // if not enough repairers
+    else if (numberOfRepairers < minimumNumberOfRepairers) {
+        // try to spawn one
+        name = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, MOVE], undefined,
+            { role: 'repairer', working: false });
+    }
+    // if not enough builders
+    else if (numberOfBuilders < minimumNumberOfBuilders) {
+        // try to spawn one
+        name = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, MOVE], undefined,
+            { role: 'builder', working: false });
+    }
+    else {
+        // else try to spawn a builder
+        name = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, MOVE], undefined,
+            { role: 'builder', working: false });
+    }
+
+    // print name to console if spawning was a success
+    // name > 0 would not work since string > 0 returns false
+    if (!(name < 0)) {
+        console.log("Spawned new " + creep.memory.role + " creep: " + name);
+    }
+};
