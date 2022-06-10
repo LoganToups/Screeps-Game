@@ -1,5 +1,8 @@
+var roleWallRepairer = require('role.wallRepairer');
+
 var roleFixer =
 {
+    
     run: function(creep)
    { 
        creep.say('🧱')
@@ -14,54 +17,29 @@ var roleFixer =
         {
             creep.memory.fixing = true;
         }
-    
+
+        //simplified the code ALOT by just implicitly looking for ALL damaged structures, instead of explicitly which started taking up a lot of space
         if(creep.memory.fixing) 
         {
-            var roadToRepair = creep.room.find(FIND_STRUCTURES, { filter: function (object) { return object.structureType == STRUCTURE_ROAD && (object.hits < object.hitsMax)}});
-            if (roadToRepair.length > 0)
-            {
-                creep.moveTo(roadToRepair[0]);
-                creep.repair(roadToRepair[0]);
-            }
-            
-            var containerToRepair = creep.room.find(FIND_STRUCTURES, { filter: function (object) { return object.structureType == STRUCTURE_CONTAINER && (object.hits < object.hitsMax)}});
-            if (containerToRepair.length > 0)
-            {
-                creep.moveTo(containerToRepair[0]);
-                creep.repair(containerToRepair[0]);
-            }
+            var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (s) => s.hits < s.hitsmax && s.structureType != STRUCTURE_WALL
+            });
+
+            if (structure != undefined) {
+                if (creep.repair(structure) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
+				}
+			}
             
              //repair dem walls!!!!!!!!!!
-            var wallToRepair = creep.room.find(FIND_STRUCTURES,
-                { filter: function (object) { return object.structureType == STRUCTURE_WALL && (object.hits < object.hitsMax)}});
-            
-            if (wallToRepair.length > 0)
+            //attempting to factor code into better form by giving other lengthy behaviors their own file
+            else
             {
-                creep.moveTo(wallToRepair[0]);
-                creep.repair(wallToRepair[0]);
-            }
-            /*var target = undefined;
-
-            for (let percentage = 0.0001; percentage <= 1; percentage = percentage + 0.0001)
-            {
-                for (let wall of wallsToRepair) {
-                    if (wall.hits / wall.hitsMax < percentage) {
-                        target = wall;
-                        break;
-                    }
-                }
-            }
-            if (target != undefined) {
-
-                if (creep.repair(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
-                }
-
-            }*/
-
+                roleWallRepairer.run(creep);
+			}
         }
             
-        else
+        if(!creep.memory.fixing)
         {
             var sources = creep.room.find(FIND_SOURCES);
             if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) 
