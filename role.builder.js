@@ -8,7 +8,7 @@ var roleBuilder =
         var numberOfHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
         if (numberOfHarvesters.length == 0)
         {
-            setTimeout(creep.memory.role = ('harvester'), 30000);
+            setTimeout(creep.memory.role = ('harvester'), 35000);
         }
 
         //Creep will check to see how much energy it has, if it zero, will return that it cannot build (false)
