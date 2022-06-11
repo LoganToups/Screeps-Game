@@ -4,12 +4,6 @@ var roleUpgrader =
     run: function (creep)
     {
         creep.say('🌐')
-
-        //Double fail-safe JUST IN CASE I dont have a harvester available, which are important, which always seem to die..
-        var numberOfHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-        if (numberOfHarvesters.length == 0) {
-            setTimeout(creep.memory.role = ('harvester'), 40000);
-        }
         
         //if the creep state is set to upgradding and the energy it is carry falls to 0, stop upgrading and do soemthing else
         if (creep.memory.upgrading && creep.carry.energy == 0) 

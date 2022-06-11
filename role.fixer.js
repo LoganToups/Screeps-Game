@@ -1,25 +1,20 @@
-//var roleWallRepairer = require('role.wallRepairer');
-
+var roleWallRepairer = require('role.wallRepairer');
 var roleFixer =
 {
-    
     run: function(creep)
    { 
         creep.say('🧱')
-
-        //Double fail-safe JUST IN CASE I dont have a harvester available, which are important, which always seem to die..
-        var numberOfHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-        if (numberOfHarvesters.length == 0)
+        
+        if(!creep.memory.fixing)
         {
-            setTimeout(creep.memory.role = ('harvester'), 30000);
+            creep.memory.fixing = false;
         }
-       
+        
         if (creep.memory.fixing == true && creep.carry.energy == 0) {
-
             creep.memory.fixing = false;
         }
         // if creep is harvesting energy but is full
-        else if (creep.memory.fixing== false && creep.carry.energy == creep.carryCapacity) {
+        if (!creep.memory.fixing && creep.carry.energy == creep.carryCapacity) {
 
             creep.memory.fixing = true;
         }
@@ -27,7 +22,7 @@ var roleFixer =
         // if creep is supposed to repair something
         //exclude walls because I have a seperate algorithm to handle it for more efficiency
         if (creep.memory.fixing == true) {
-
+                
             var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 
                 filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL
