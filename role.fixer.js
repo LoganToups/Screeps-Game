@@ -35,7 +35,6 @@ var roleFixer =
             //attempting to factor code into better form by giving other lengthy behaviors their own file
             else
             {
-                console.log('Wall repair');
                 roleWallRepairer.run(creep);
 			}
         }

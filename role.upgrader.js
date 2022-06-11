@@ -31,7 +31,7 @@ var roleUpgrader =
                 creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#0000ff' } });
             }
         }
-        //signing a controller to display a message
+        //signing a controller to display a message, keeping this code commented out for later use or something
         
         /*if(creep.room.controller)
         {

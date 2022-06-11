@@ -29,7 +29,8 @@ module.exports.loop = function ()
         var newName = 'Harvester' + Game.time;
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
             { memory: { role: 'harvester' } })
-        /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works*/
+        /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works <--- turns out the first itteration did NOT work...
+         it works now though*/
         if (Game.spawns['Spawn1'] == ERR_NOT_ENOUGH_ENERGY && numberOfHarvesters.length == 0)
         {
             Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } })

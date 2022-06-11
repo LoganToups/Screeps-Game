@@ -1,25 +1,27 @@
-var roleWallRepairer =
+﻿var roleWallRepairer =
 {
-    // a function to run the logic for this role
-    /** @param {Creep} creep */
-    run: function (creep) {
+    // a function to run the logic for the extended role of fixer to try to keep code readability
+    run: function (creep)
+    {
+        creep.say('🚧');
+
         // if creep is trying to repair something but has no energy left
-        if (creep.memory.working == true && creep.carry.energy == 0)
+        if (creep.memory.fixing == true && creep.carry.energy == 0)
         {
-            // switch state
-            creep.memory.working = false;
+            console.log('memory false');
+            creep.memory.fixing = false;
         }
         // if creep is harvesting energy but is full
-        else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity)
+        else if (creep.memory.fixing == false && creep.carry.energy == creep.carryCapacity)
         {
-            // switch state
-            creep.memory.working = true;
+
+            creep.memory.fixing = true;
         }
 
         // if creep is supposed to repair something
-        if (creep.memory.working == true)
+        if (creep.memory.fixing == true)
         {
-            // find all walls in the room
+
             var walls = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => s.structureType == STRUCTURE_WALL
             });
@@ -42,7 +44,6 @@ var roleWallRepairer =
                 // if there is one
                 if (target != undefined)
                 {
-                    // break the loop
                     break;
                 }
             }
@@ -50,20 +51,18 @@ var roleWallRepairer =
             // if we find a wall that has to be repaired
             if (target != undefined)
             {
-                // try to repair it, if not in range
                 if (creep.repair(target) == ERR_NOT_IN_RANGE)
+                    console.log('not in range');
                 {
-                    // move towards it
                     creep.moveTo(target);
                 }
             }
-            // if we can't fine one
 
         }
-        // if creep is supposed to get energy
+        // if no walls need repairing, go back to fixing shit.... took me forever to figure out I can just switch modules this easy ._.
         else
         {
-
+            role.fixer.run(Creep);
         }
     }
 };

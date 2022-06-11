@@ -37,7 +37,7 @@ var roleHarvester =
         }
         
         /* Harvest creeps will also look for Extension structures and Towers to refill as needed
-        Can possible expand this to include more structres later*/
+        Can possible expand this to include more structres later, or just implicitly allow it to look for ALL fillable structures, not sure how efficent that would be*/
         else
         {
             var fillExtension = creep.room.find(FIND_STRUCTURES, {filter: (structure) => 
