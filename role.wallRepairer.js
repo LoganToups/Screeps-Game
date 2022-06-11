@@ -52,7 +52,6 @@
             if (target != undefined)
             {
                 if (creep.repair(target) == ERR_NOT_IN_RANGE)
-                    console.log('not in range');
                 {
                     creep.moveTo(target);
                 }
