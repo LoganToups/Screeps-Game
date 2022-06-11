@@ -5,6 +5,12 @@
     {
         creep.say('🚧');
 
+        //Double fail-safe JUST IN CASE I dont have a harvester available, which are important, which always seem to die..
+        var numberOfHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
+        if (numberOfHarvesters.length < 1) {
+            creep.memory.role = ('harvester');
+        }
+
         // if creep is trying to repair something but has no energy left
         if (creep.memory.fixing == true && creep.carry.energy == 0)
         {
@@ -53,7 +59,7 @@
             {
                 if (creep.repair(target) == ERR_NOT_IN_RANGE)
                 {
-                    creep.moveTo(target);
+                    creep.moveTo(target, { visualizePathStyle: { stroke: '#00ff00' } });
                 }
             }
 

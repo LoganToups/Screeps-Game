@@ -1,5 +1,5 @@
 //stable
-
+require('prototype.tower');
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -24,20 +24,20 @@ module.exports.loop = function ()
 
     /*added prioritization*/
     //Look how many creeps are left by role, and create more when there aren't enough
-    if (numberOfHarvesters.length < 1)
+    if (numberOfHarvesters.length < 2)
     {
         var newName = 'Harvester' + Game.time;
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
             { memory: { role: 'harvester' } })
         /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works <--- turns out the first itteration did NOT work...
          it works now though*/
-        if (Game.spawns['Spawn1'] == ERR_NOT_ENOUGH_ENERGY && numberOfHarvesters.length == 0)
+        if (Game.spawns['Spawn1'] == numberOfHarvesters.length == 0)
         {
             Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } })
         }
     }
  
-   if (numberOfupgraders.length < 3)
+   if (numberOfupgraders.length < 2)
     {
         var newName = 'Upgrader' + Game.time;;
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
@@ -54,7 +54,7 @@ module.exports.loop = function ()
     if (numberOfFixers.length < 2)
     {
         var newName = 'Fixer' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], newName,
         {memory: {role: 'fixer'}});
     }
     
@@ -77,6 +77,15 @@ module.exports.loop = function ()
         {
             roleFixer.run(creep);
         }
+    }
+
+    // find all towers
+    var towers = _.filter(Game.structures, s => s.structureType == STRUCTURE_TOWER);
+    // for each tower
+    for (let tower of towers)
+    {
+        // run tower logic
+        tower.defend();
     }
 }
 
