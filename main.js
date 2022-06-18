@@ -4,6 +4,7 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleFixer = require('role.fixer');
+var roleLongDistanceHarvester = require('role.longDistanceHarvester');
 
 module.exports.loop = function () 
 {
@@ -21,26 +22,33 @@ module.exports.loop = function ()
     var numberOfupgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
     var numberOfBuilders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
     var numberOfFixers = _.filter(Game.creeps, (creep) => creep.memory.role == 'fixer');
+    var numberOfLongDistanceHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'longDistanceHarvester');
 
     /*added prioritization*/
     //Look how many creeps are left by role, and create more when there aren't enough
     if (numberOfHarvesters.length < 2)
     {
         var newName = 'Harvester' + Game.time;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
             { memory: { role: 'harvester' } })
         /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works <--- turns out the first itteration did NOT work...
          it works now though*/
         if (Game.spawns['Spawn1'] == numberOfHarvesters.length == 0)
         {
-            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' } })
+            Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' }});
         }
+    }
+    
+    if (numberOfLongDistanceHarvesters.length < 0)
+    {
+        var newName = 'LD-Harvester' + Game.time;
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], newName, {memory:{role:'longDistanceHarvester'}});
     }
  
    if (numberOfupgraders.length < 2)
     {
         var newName = 'Upgrader' + Game.time;;
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], newName,
         {memory: {role: 'upgrader'}});
     }
     
@@ -51,7 +59,7 @@ module.exports.loop = function ()
         {memory: {role: 'builder'}});
     }
 
-    if (numberOfFixers.length < 2)
+    if (numberOfFixers.length < 4)
     {
         var newName = 'Fixer' + Game.time;
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], newName,
@@ -76,6 +84,10 @@ module.exports.loop = function ()
         if(creep.memory.role == 'fixer')
         {
             roleFixer.run(creep);
+        }
+        if(creep.memory.role == 'longDistanceHarvester')
+        {
+            roleLongDistanceHarvester.run(creep);
         }
     }
 

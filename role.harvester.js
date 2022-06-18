@@ -38,29 +38,31 @@ var roleHarvester =
         
         /* Harvest creeps will also look for Extension structures and Towers to refill as needed
         Can possible expand this to include more structres later, or just implicitly allow it to look for ALL fillable structures, not sure how efficent that would be*/
-        else
-        {
-            var fillExtension = creep.room.find(FIND_STRUCTURES, {filter: (structure) => 
-                {return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity}});
-            if (creep.transfer(fillExtension[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-            {
-                creep.moveTo(fillExtension[0]);
+        if (creep.memory.harvesting == true) {
+            // find closest spawn, extension or tower which is not full
+            var structure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                // the second argument for findClosestByPath is an object which takes
+                // a property called filter which can be a function
+                // we use the arrow operator to define it
+                filter: (s) => (s.structureType == STRUCTURE_SPAWN
+                    || s.structureType == STRUCTURE_EXTENSION
+                    || s.structureType == STRUCTURE_TOWER)
+                    && s.energy < s.energyCapacity
+            });
+
+            if (structure != undefined) {
+                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
+                }
             }
 
-
-            else 
-            {
-                var fillContainer = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => { return (structure.structureType == STRUCTURE_CONTAINER && structure.energy < structure.energyCapacity) }});
-
-                if (creep.transfer(fillContainer[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-                {
-                    creep.moveTo(fillContainer[0], { visualizePathStyle: { stroke: '#ffa31a' }});
+            else {
+                var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source);
                 }
-                
             }
         }
-
     }
 };
 module.exports = roleHarvester;

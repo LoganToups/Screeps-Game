@@ -38,7 +38,7 @@ var roleUpgrader =
         
         /*if(creep.room.controller)
         {
-            if(creep.signController(creep.room.controller, "Bby dont hurt me, it's my first time <3") == ERR_NOT_IN_RANGE) 
+            if(creep.signController(creep.room.controller, "Friendly, just trying to have a chill time") == ERR_NOT_IN_RANGE) 
             {
             creep.moveTo(creep.room.controller);
             }

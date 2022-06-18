@@ -25,7 +25,7 @@ var roleFixer =
                 
             var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 
-                filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL
+                filter: (s) => s.hits < s.hitsMax / 2 && s.structureType != STRUCTURE_WALL
             });
 
  

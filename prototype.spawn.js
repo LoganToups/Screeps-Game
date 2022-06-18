@@ -1,4 +1,6 @@
-module.exports = function()
+//unused, not working properly
+
+module.exports = function ()
 {
 
     StructureSpawn.prototype.createCustomCreep = function (energy, roleName)
