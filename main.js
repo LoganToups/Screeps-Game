@@ -1,4 +1,4 @@
-//stable
+//Welcome to the speghetti train!
 require('prototype.tower');
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
@@ -24,7 +24,6 @@ module.exports.loop = function ()
     var numberOfFixers = _.filter(Game.creeps, (creep) => creep.memory.role == 'fixer');
     var numberOfLongDistanceHarvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'longDistanceHarvester');
 
-    /*added prioritization*/
     //Look how many creeps are left by role, and create more when there aren't enough
     if (numberOfHarvesters.length < 2)
     {
@@ -33,13 +32,13 @@ module.exports.loop = function ()
             { memory: { role: 'harvester' } })
         /*added failsafe to always be able to spawn at least 1 harvester in case of catistrophic failure, hope it works <--- turns out the first itteration did NOT work...
          it works now though*/
-        if (Game.spawns['Spawn1'] == numberOfHarvesters.length == 0)
+        if (numberOfHarvesters.length == 0)
         {
             Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], newName, { memory: { role: 'harvester' }});
         }
     }
-    
-    if (numberOfLongDistanceHarvesters.length < 0)
+    // Look at how many creeps by role are left, and if less than the desired amount, create more.
+    if (numberOfLongDistanceHarvesters.length < 0) // not working
     {
         var newName = 'LD-Harvester' + Game.time;
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], newName, {memory:{role:'longDistanceHarvester'}});
@@ -65,7 +64,7 @@ module.exports.loop = function ()
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], newName,
         {memory: {role: 'fixer'}});
     }
-    
+    // assign creeps logic by role, messy implementation but it works I guess
     for(var name in Game.creeps)
     {
         var creep = Game.creeps[name];
